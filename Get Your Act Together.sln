@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Get Your Act Together", "Get Your Act Together\Get Your Act Together.vcxproj", "{2CB6E678-92C4-4C74-91EA-014D1025F3C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2CB6E678-92C4-4C74-91EA-014D1025F3C1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2CB6E678-92C4-4C74-91EA-014D1025F3C1}.Debug|Win32.Build.0 = Debug|Win32
+		{2CB6E678-92C4-4C74-91EA-014D1025F3C1}.Release|Win32.ActiveCfg = Release|Win32
+		{2CB6E678-92C4-4C74-91EA-014D1025F3C1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
