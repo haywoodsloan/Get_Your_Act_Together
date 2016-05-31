@@ -275,9 +275,7 @@ void blockSites(vector<char*> siteList)
 		status = FwpmFilterAdd0(engineHandle, &blockSiteFilterO, 0, &(blockSiteFilterO.filterId));
 		status = FwpmFilterAdd0(engineHandle, &blockSiteFilterV6I, 0, &(blockSiteFilterV6I.filterId));
 		status = FwpmFilterAdd0(engineHandle, &blockSiteFilterV6O, 0, &(blockSiteFilterV6O.filterId));
-
-		OutputDebugString(std::to_string(blockSiteFilterI.filterId).c_str());
-
+		
 		delete[](filterConditions);
 		delete[](addrAndMasks);
 		delete[](filterConditionsV6);
