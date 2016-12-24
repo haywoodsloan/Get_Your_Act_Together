@@ -110,7 +110,7 @@ bool ProtectProcess(void)
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = FALSE;
 
-	TCHAR * szSD = TEXT("D:P");
+	TCHAR * szSD = TEXT("D:PS:P");
 
 	if (!ConvertStringSecurityDescriptorToSecurityDescriptor(szSD, SDDL_REVISION_1, &(sa.lpSecurityDescriptor), NULL))
 		isSuccess = FALSE;
