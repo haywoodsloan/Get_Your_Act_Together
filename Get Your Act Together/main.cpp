@@ -167,7 +167,7 @@ DWORD WINAPI hookThread(LPVOID lpParam)
 	HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
 
 	MSG msg;
-	while (!GetMessage(&msg, NULL, NULL, NULL)) {
+	while (GetMessage(&msg, NULL, NULL, NULL) != 0 || !exiting) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
