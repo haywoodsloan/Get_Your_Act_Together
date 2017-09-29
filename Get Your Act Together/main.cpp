@@ -87,7 +87,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_QUIT:
 	case WM_QUERYENDSESSION:
 		return FALSE;
-		break;
 	case WM_CREATE:
 		ShutdownBlockReasonCreate(hWnd, L"You can't close me that easily");
 		break;
