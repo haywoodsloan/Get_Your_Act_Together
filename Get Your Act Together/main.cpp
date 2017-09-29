@@ -17,50 +17,50 @@ HINSTANCE hInst;
 HWND hWnd;
 
 //Checks that the input isn't broken
-bool verifyInput() {
-
-	if (cin.fail()) {
-
+bool verifyInput()
+{
+	if (cin.fail())
+	{
 		cin.clear();
 		cin.ignore(INT_MAX, '\n');
 
 		cout << "That is not a valid input. Try again!" << endl;
 		return false;
-
 	}
-	else {
-
+	else
+	{
 		return true;
-
 	}
 }
 
 //Kill application that should be allowed
-DWORD WINAPI appKillThread(LPVOID text) {
-
+DWORD WINAPI appKillThread(LPVOID text)
+{
 	PROCESSENTRY32 entry;
 	entry.dwSize = sizeof(PROCESSENTRY32);
 
 	HANDLE snapshot;
 
-	while (true) {
-
+	while (true)
+	{
 		snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
-		if (Process32First(snapshot, &entry) == TRUE) {
-
-			while (Process32Next(snapshot, &entry) == TRUE) {
-
+		if (Process32First(snapshot, &entry) == TRUE)
+		{
+			while (Process32Next(snapshot, &entry) == TRUE)
+			{
 				bool matches = false;
 
-				for (unsigned int i = 0; i < processes.size(); i++) {
-					if (_stricmp(entry.szExeFile, processes[i]) == 0) {
+				for (unsigned int i = 0; i < processes.size(); i++)
+				{
+					if (_stricmp(entry.szExeFile, processes[i]) == 0)
+					{
 						matches = true;
 					}
 				}
 
-				if (matches) {
-
+				if (matches)
+				{
 					HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
 
 					TerminateProcess(process, 0);
@@ -71,7 +71,6 @@ DWORD WINAPI appKillThread(LPVOID text) {
 		}
 
 		CloseHandle(snapshot);
-
 		Sleep(200);
 	}
 }
@@ -96,6 +95,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
+
 	return 0;
 }
 
@@ -117,7 +117,7 @@ bool ProtectProcess(void)
 
 	if (!SetKernelObjectSecurity(hProcess, DACL_SECURITY_INFORMATION, sa.lpSecurityDescriptor))
 		isSuccess = FALSE;
-	
+
 	//Protect from shutdown kills
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -131,7 +131,7 @@ bool ProtectProcess(void)
 	cls.lpszClassName = "ShutdownProtect";
 
 	RegisterClassEx(&cls);
-	if(!CreateWindowEx(0, "ShutdownProtect", "Get Your Act Together", 0, 0, 0, 0, 0, 0, 0, hInstance, 0))
+	if (!CreateWindowEx(0, "ShutdownProtect", "Get Your Act Together", 0, 0, 0, 0, 0, 0, 0, hInstance, 0))
 		isSuccess = FALSE;
 
 	return isSuccess;
@@ -142,22 +142,24 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (nCode == HC_ACTION)
 	{
-
-		if (wParam == WM_KEYDOWN){
+		if (wParam == WM_KEYDOWN)
+		{
 			KBDLLHOOKSTRUCT* key = (KBDLLHOOKSTRUCT*)lParam;
 
-			for (int i = 0; i < 5; i++){
+			for (int i = 0; i < 5; i++)
+			{
 				workingSet[i] = workingSet[i + 1];
 			}
 
 			workingSet[5] = char(key->vkCode);
 
-			if (!_strcmpi(workingSet, "qwebnm")){
+			if (!_strcmpi(workingSet, "qwebnm"))
+			{
 				exiting = true;
 			}
-
 		}
 	}
+
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
@@ -167,7 +169,8 @@ DWORD WINAPI hookThread(LPVOID lpParam)
 	HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
 
 	MSG msg;
-	while (GetMessage(&msg, NULL, NULL, NULL) != 0 || !exiting) {
+	while (GetMessage(&msg, NULL, NULL, NULL) != 0 || !exiting)
+	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -178,15 +181,18 @@ DWORD WINAPI hookThread(LPVOID lpParam)
 }
 
 //Define blocked websites
-void assignVectors(int musicOpts){
-	if (musicOpts == 2){
+void assignVectors(int musicOpts)
+{
+	if (musicOpts == 2)
+	{
 		processes = vector<char*>({ "steam.exe", "minecraft.exe", "java.exe", "javaw.exe", "leagueoflegends.exe", "wow.exe" });
 
 		websites = vector<char*>({ "facebook.com", "tumblr.com", "reddit.com", "xkcd.com", "myspace.com", "magic.wizards.com",
 			"gatherer.wizards.com", "explosm.net", "smbc-comics.com", "youtube.com", "onemorelevel.com", "tappedout.net",
 			"deckbox.org", "mtgstocks.com", "imgur.com" });
 	}
-	else{
+	else
+	{
 		processes = vector<char*>({ "steam.exe", "minecraft.exe", "java.exe", "javaw.exe", "leagueoflegends.exe", "wow.exe", "spotify.exe" });
 
 		websites = vector<char*>({ "facebook.com", "tumblr.com", "reddit.com", "xkcd.com", "myspace.com", "magic.wizards.com",
@@ -195,15 +201,16 @@ void assignVectors(int musicOpts){
 	}
 }
 
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv)
+{
 	ProtectProcess();
 
 	cout << "Do you want to block music applications and sites?" << endl << "[1] Yes" << endl << "[2] No" << endl;
 
 	int musicOpt;
 
-	do {
+	do
+	{
 		cin >> musicOpt;
 	} while (!verifyInput());
 
@@ -213,7 +220,8 @@ int main(int argc, char** argv) {
 
 	int minutes;
 
-	do {
+	do
+	{
 		cin >> minutes;
 	} while (!verifyInput());
 
@@ -225,7 +233,8 @@ int main(int argc, char** argv) {
 
 	time_t start = time(NULL);
 
-	while (difftime(time(NULL), start) < minutes * 60 && !exiting){
+	while (difftime(time(NULL), start) < minutes * 60 && !exiting)
+	{
 		blockSites(websites);
 		Sleep(5000);
 	}
