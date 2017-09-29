@@ -13,6 +13,7 @@ bool exiting = false;
 vector<char*> processes;
 vector<char*> websites;
 
+DWORD mainThreadID;
 HINSTANCE hInst;
 HWND hWnd;
 
@@ -158,6 +159,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if (!_strcmpi(workingSet, "qwebnm"))
 			{
 				exiting = true;
+				PostQuitMessage(0);
 			}
 		}
 	}
@@ -166,18 +168,21 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 //Thread to set keyhook and loop message thread
-DWORD WINAPI hookThread(LPVOID lpParam)
+DWORD WINAPI siteBlockThread(LPVOID lpParam)
 {
-	HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
-
-	MSG msg;
-	while (GetMessage(&msg, NULL, NULL, NULL) != 0 || !exiting)
+	int minutes = *((int*)lpParam);
+	time_t start = time(NULL);
+	while (difftime(time(NULL), start) < minutes * 60 && !exiting)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		blockSites(websites);
+		Sleep(5000);
 	}
 
-	UnhookWindowsHookEx(hook);
+	if (!exiting)
+	{
+		exiting = true;
+		PostThreadMessage(mainThreadID, WM_QUIT, 0, 0);
+	}
 
 	return 0;
 }
@@ -229,20 +234,22 @@ int main(int argc, char** argv)
 
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 
-	HANDLE killT = CreateThread(NULL, 0, appKillThread, NULL, 0, NULL);
-	HANDLE hookT = CreateThread(NULL, 0, hookThread, NULL, 0, NULL);
+	mainThreadID = GetCurrentThreadId();
+	HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
+	HANDLE killThread = CreateThread(NULL, 0, appKillThread, NULL, 0, NULL);
+	HANDLE blockThread = CreateThread(NULL, 0, siteBlockThread, &minutes, 0, NULL);
 
-	time_t start = time(NULL);
-	while (difftime(time(NULL), start) < minutes * 60 && !exiting)
+	MSG msg;
+	while (!exiting)
 	{
-		blockSites(websites);
-		Sleep(5000);
+		GetMessage(&msg, NULL, NULL, NULL);
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
-	PostThreadMessage(GetThreadId(hookT), WM_QUIT, 0, 0);
-	WaitForSingleObject(killT, INFINITE);
-	WaitForSingleObject(hookT, INFINITE);
 	removeFilter();
+	WaitForSingleObject(killThread, INFINITE);
+	WaitForSingleObject(blockThread, INFINITE);
 
 	return 0;
 }
