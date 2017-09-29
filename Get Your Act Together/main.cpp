@@ -240,9 +240,9 @@ int main(int argc, char** argv)
 	}
 
 	PostThreadMessage(GetThreadId(hookT), WM_QUIT, 0, 0);
-	removeFilter();
 	WaitForSingleObject(killT, INFINITE);
 	WaitForSingleObject(hookT, INFINITE);
+	removeFilter();
 
 	return 0;
 }
