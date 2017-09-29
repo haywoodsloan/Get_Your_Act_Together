@@ -41,7 +41,7 @@ DWORD WINAPI appKillThread(LPVOID text)
 
 	HANDLE snapshot;
 
-	while (true)
+	while (!exiting)
 	{
 		snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
@@ -73,6 +73,8 @@ DWORD WINAPI appKillThread(LPVOID text)
 		CloseHandle(snapshot);
 		Sleep(200);
 	}
+
+	return 0;
 }
 
 //Needed to protect from shutdown kill
@@ -227,19 +229,20 @@ int main(int argc, char** argv)
 
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 
-	CreateThread(NULL, 0, appKillThread, NULL, 0, NULL);
-
-	CreateThread(NULL, 0, hookThread, NULL, 0, NULL);
+	HANDLE killT = CreateThread(NULL, 0, appKillThread, NULL, 0, NULL);
+	HANDLE hookT = CreateThread(NULL, 0, hookThread, NULL, 0, NULL);
 
 	time_t start = time(NULL);
-
 	while (difftime(time(NULL), start) < minutes * 60 && !exiting)
 	{
 		blockSites(websites);
 		Sleep(5000);
 	}
 
+	PostThreadMessage(GetThreadId(hookT), WM_QUIT, 0, 0);
 	removeFilter();
+	WaitForSingleObject(killT, INFINITE);
+	WaitForSingleObject(hookT, INFINITE);
 
 	return 0;
 }
